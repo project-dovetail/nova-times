@@ -25,3 +25,10 @@ def test_cli_describe(runner):
     result = runner.invoke(cli, "describe")
     assert result.exit_code == 0
     assert "Describe" in result.output
+
+
+@pytest.mark.skip("not implemented")
+def test_cli_describe_w_filename(runner):
+    result = runner.invoke(cli, ["describe", "tests/data/aavso_000-BPZ-067.csv"])
+    assert result.exit_code == 0
+    assert "Describe" in result.output
