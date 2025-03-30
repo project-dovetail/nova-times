@@ -1,5 +1,8 @@
 import click
 
+from nova_times.describe import describe_dataset
+from nova_times.io import read_csv
+
 
 @click.group("nova-times")
 def cli() -> None:
@@ -7,8 +10,17 @@ def cli() -> None:
 
 
 @click.command()
-def describe() -> None:
-    print("Nova Times CLI - Describe")
+@click.argument("filename", required=True)
+def describe(filename: str) -> None:
+    try:
+        data_table = read_csv(filename)
+    except FileNotFoundError as err:
+        raise click.FileError(filename, hint=str(err))
+
+    description = describe_dataset(data_table)
+
+    for key, value in description.items():
+        print(f"{key}: {value}")
     return
 
 

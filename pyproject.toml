@@ -26,6 +26,15 @@ packages = [{include = "nova_times", from = "src"}]
 module = ["astropy.*"]
 ignore_missing_imports = true
 
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.pytest.ini_options]
+addopts = "--cov"
+
 [project.scripts]
 nova-times = 'nova_times.cli:cli'
 
