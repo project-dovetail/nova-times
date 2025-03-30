@@ -1,2 +1,4 @@
-# nova-times
-Measuring nova decay times
+# Nova Times
+
+Measuring Nova decay times.
+
