@@ -8,6 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+    "click (>=8.1.8,<9.0.0)"
 ]
 
 [tool.poetry.group.test.dependencies]
@@ -20,7 +21,7 @@ mypy = "^1.15.0"
 packages = [{include = "nova_times", from = "src"}]
 
 [project.scripts]
-nova_times = 'nova_times.cli:cli'
+nova-times = 'nova_times.cli:cli'
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

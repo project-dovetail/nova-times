@@ -1,7 +1,15 @@
+import click
+
+
+@click.group("nova-times")
 def cli() -> None:
-    print("Nova Times CLI")
+    pass
+
+
+@click.command()
+def describe() -> None:
+    print("Nova Times CLI - Describe")
     return
 
 
-if __name__ == "__main__":
-    cli()
+cli.add_command(describe)
