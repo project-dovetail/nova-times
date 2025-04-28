@@ -1,9 +1,13 @@
+import json
 from typing import Optional
 
 import click
 import matplotlib.pyplot as plt
+from astropy.table import Table
+
 
 from nova_times.describe import describe_dataset
+from nova_times.measure import measure_time
 from nova_times.viz import viz_dataset
 from nova_times.io import read_csv
 
@@ -13,13 +17,18 @@ def cli() -> None:
     pass
 
 
-@click.command()
-@click.argument("filename", required=True)
-def describe(filename: str) -> None:
+def read_file(filename: str) -> Table:
     try:
         data_table = read_csv(filename)
     except FileNotFoundError as err:
         raise click.FileError(filename, hint=str(err))
+    return data_table
+
+
+@click.command()
+@click.argument("filename", required=True)
+def describe(filename: str) -> None:
+    data_table = read_file(filename)
 
     description = describe_dataset(data_table)
 
@@ -33,10 +42,7 @@ def describe(filename: str) -> None:
 @click.argument("output_filename", required=True)
 @click.option("-b", "--band", "band")
 def viz(filename: str, output_filename: str, band: Optional[str] = None) -> None:
-    try:
-        data_table = read_csv(filename)
-    except FileNotFoundError as err:
-        raise click.FileError(filename, hint=str(err))
+    data_table = read_file(filename)
 
     fig, ax = plt.subplots()
 
@@ -45,5 +51,18 @@ def viz(filename: str, output_filename: str, band: Optional[str] = None) -> None
     plt.savefig(output_filename)
 
 
+@click.command()
+@click.argument("filename", required=True)
+# @click.argument("output_filename", required=True)
+# @click.option("-b", "--band", "band")
+def measure(filename: str) -> None:
+    data_table = read_file(filename)
+
+    timing_data = measure_time(data_table)
+
+    print(json.dumps(timing_data, indent=4))
+
+
 cli.add_command(describe)
 cli.add_command(viz)
+cli.add_command(measure)

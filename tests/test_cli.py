@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
 import pytest
+from click import FileError
 from click.testing import CliRunner
 
-from nova_times.cli import cli
+from nova_times.cli import cli, read_file
 
 
 @pytest.fixture
@@ -21,6 +22,17 @@ def test_cli_help(runner):
     result = runner.invoke(cli, "--help")
     assert result.exit_code == 0
     assert "Usage: nova-times" in result.output
+
+
+@patch("nova_times.cli.read_csv")
+def test_read_file(mock_read_csv):
+    read_file("good_filename")
+    mock_read_csv.assert_called_with("good_filename")
+
+
+def test_read_invalid_file():
+    with pytest.raises(FileError):
+        read_file("bad_filename")
 
 
 def test_cli_describe_requires_filename(runner):
@@ -43,12 +55,6 @@ def test_cli_describe_valid(mock_read_csv, mock_describe_dataset, runner):
     assert "num_obs: 123" in result.output
     mock_read_csv.assert_called_with("good_filename")
     mock_describe_dataset.assert_called_with(mock_read_csv.return_value)
-
-
-def test_cli_viz_w_invalid_filename(runner):
-    result = runner.invoke(cli, ["viz", "bad_filename", "outputfile"])
-    assert result.exit_code == 1
-    assert "Error: Could not open file 'bad_filename'" in result.output
 
 
 @patch("nova_times.cli.viz_dataset")
@@ -76,3 +82,13 @@ def test_cli_viz_band(mock_read_csv, mock_viz_dataset, tmp_path, runner):
     assert result.exit_code == 0
     assert output_filename in tmp_path.iterdir()
     assert len(list(tmp_path.iterdir())) == 1
+
+
+@patch("nova_times.cli.measure_time")
+@patch("nova_times.cli.read_csv")
+def test_cli_measure_default(mock_read_csv, mock_measure_time, runner):
+    mock_measure_time.return_value = {"a": 1}
+    result = runner.invoke(cli, ["measure", "good_filename"])
+    mock_read_csv.assert_called_with("good_filename")
+    assert mock_read_csv.return_value in mock_measure_time.call_args[0]
+    assert result.exit_code == 0
