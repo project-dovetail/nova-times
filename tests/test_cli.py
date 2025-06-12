@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -49,10 +50,11 @@ def test_cli_describe_w_invalid_filename(runner):
 @patch("nova_times.cli.describe_dataset")
 @patch("nova_times.cli.read_csv")
 def test_cli_describe_valid(mock_read_csv, mock_describe_dataset, runner):
-    mock_describe_dataset.return_value = {"num_obs": 123}
+    mock_data = {"num_obs": 123, "num_bands": 3}
+    mock_describe_dataset.return_value = mock_data
     result = runner.invoke(cli, ["describe", "good_filename"])
     assert result.exit_code == 0
-    assert "num_obs: 123" in result.output
+    assert json.loads(result.output) == mock_data
     mock_read_csv.assert_called_with("good_filename")
     mock_describe_dataset.assert_called_with(mock_read_csv.return_value)
 
