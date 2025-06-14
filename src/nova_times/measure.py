@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 import numpy as np
 from astropy.table import Table
@@ -16,8 +16,10 @@ TimingData = TypedDict(
 )
 
 
-def measure_time(dataset: Table) -> TimingData:
-    mask = dataset.groups.keys["Band"] == "V"
+def measure_time(dataset: Table, band: Optional[str] = None) -> TimingData:
+    if band is None:
+        band = "V"
+    mask = dataset.groups.keys["Band"] == band
     singleband_data = dataset.groups[mask]
     magnitudes = singleband_data["Magnitude"]
     jds = singleband_data["JD"]
@@ -34,7 +36,7 @@ def measure_time(dataset: Table) -> TimingData:
     t2_jd = jds[t2_indx]
 
     results = TimingData(
-        band="V",
+        band=band,
         maximum_jd=maximum_jd,
         maximum_mag=maximum_mag,
         t2_mag=t2_mag,
