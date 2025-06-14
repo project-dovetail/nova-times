@@ -31,9 +31,7 @@ def describe(filename: str) -> None:
     data_table = read_file(filename)
 
     description = describe_dataset(data_table)
-
-    for key, value in description.items():
-        print(f"{key}: {value}")
+    print(json.dumps(description, indent=4))
     return
 
 
