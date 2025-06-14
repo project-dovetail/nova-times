@@ -15,6 +15,10 @@ class TestMeasureTime:
         result = measure_time(test_dataset)
         assert isinstance(result, dict)
 
+    def test_default_band_is_V(self, test_dataset):
+        result = measure_time(test_dataset)
+        assert result["band"] == "V"
+
     def test_maximum_mag(self, test_dataset):
         result = measure_time(test_dataset)
         assert result["maximum_mag"] == 9.42
@@ -34,3 +38,8 @@ class TestMeasureTime:
         result = measure_time(test_dataset)
         assert result["t2_jd"] == 2460573.96765
         assert isinstance(result["maximum_jd"], float)
+
+    def test_can_select_different_band(self, test_dataset):
+        result = measure_time(test_dataset, band="B")
+        assert result["band"] == "B"
+        assert result["maximum_mag"] == 11.296

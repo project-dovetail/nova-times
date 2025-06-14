@@ -52,11 +52,11 @@ def viz(filename: str, output_filename: str, band: Optional[str] = None) -> None
 @click.command()
 @click.argument("filename", required=True)
 # @click.argument("output_filename", required=True)
-# @click.option("-b", "--band", "band")
-def measure(filename: str) -> None:
+@click.option("-b", "--band", "band")
+def measure(filename: str, band: Optional[str] = None) -> None:
     data_table = read_file(filename)
 
-    timing_data = measure_time(data_table)
+    timing_data = measure_time(data_table, band=band)
 
     print(json.dumps(timing_data, indent=4))
 

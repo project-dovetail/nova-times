@@ -94,3 +94,15 @@ def test_cli_measure_default(mock_read_csv, mock_measure_time, runner):
     mock_read_csv.assert_called_with("good_filename")
     assert mock_read_csv.return_value in mock_measure_time.call_args[0]
     assert result.exit_code == 0
+
+
+@patch("nova_times.cli.measure_time")
+@patch("nova_times.cli.read_csv")
+def test_cli_measure_band(mock_read_csv, mock_measure_time, runner):
+    mock_measure_time.return_value = {"a": 1}
+    result = runner.invoke(cli, ["measure", "good_filename", "--band", "band1"])
+    mock_read_csv.assert_called_with("good_filename")
+    assert "band" in mock_measure_time.call_args[1]
+    assert mock_measure_time.call_args[1]["band"] == "band1"
+    assert mock_read_csv.return_value in mock_measure_time.call_args[0]
+    assert result.exit_code == 0
