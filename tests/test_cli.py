@@ -6,6 +6,7 @@ from click import FileError
 from click.testing import CliRunner
 
 from nova_times.cli import cli, read_file
+from nova_times.exceptions import MissingDataError
 
 
 @pytest.fixture
@@ -106,3 +107,12 @@ def test_cli_measure_band(mock_read_csv, mock_measure_time, runner):
     assert mock_measure_time.call_args[1]["band"] == "band1"
     assert mock_read_csv.return_value in mock_measure_time.call_args[0]
     assert result.exit_code == 0
+
+
+@patch("nova_times.cli.measure_time")
+@patch("nova_times.cli.read_csv")
+def test_cli_measure_raises_on_no_data(mock_read_csv, mock_measure_time, runner):
+    mock_measure_time.side_effect = MissingDataError("not enough Data")
+    result = runner.invoke(cli, ["measure", "good_filename", "--band", "band1"])
+    assert "Error: not enough Data" in result.stdout
+    assert result.exit_code == 1
