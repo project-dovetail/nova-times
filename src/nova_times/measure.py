@@ -3,6 +3,7 @@ from typing import Optional, TypedDict
 import numpy as np
 from astropy.table import Table
 
+from nova_times.exceptions import MissingDataError
 
 TimingData = TypedDict(
     "TimingData",
@@ -17,10 +18,15 @@ TimingData = TypedDict(
 
 
 def measure_time(dataset: Table, band: Optional[str] = None) -> TimingData:
+    MINIMUM_NUM_DATA = 10
     if band is None:
         band = "V"
     mask = dataset.groups.keys["Band"] == band
     singleband_data = dataset.groups[mask]
+    if len(singleband_data) < MINIMUM_NUM_DATA:
+        raise MissingDataError(
+            f"{len(singleband_data)} points in band {band}, {MINIMUM_NUM_DATA} required"
+        )
     magnitudes = singleband_data["Magnitude"]
     jds = singleband_data["JD"]
 

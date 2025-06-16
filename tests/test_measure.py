@@ -1,5 +1,6 @@
 import pytest
 
+from nova_times.exceptions import MissingDataError
 from nova_times.measure import measure_time
 from nova_times.io import read_csv
 
@@ -43,3 +44,8 @@ class TestMeasureTime:
         result = measure_time(test_dataset, band="B")
         assert result["band"] == "B"
         assert result["maximum_mag"] == 11.296
+
+    def test_raises_when_no_data(self, test_dataset):
+        with pytest.raises(MissingDataError) as err:
+            measure_time(test_dataset, band="NotARealBand")
+        assert "0 points in band NotARealBand" in str(err.value)

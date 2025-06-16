@@ -7,6 +7,7 @@ from astropy.table import Table
 
 
 from nova_times.describe import describe_dataset
+from nova_times.exceptions import MissingDataError
 from nova_times.measure import measure_time
 from nova_times.viz import viz_dataset
 from nova_times.io import read_csv
@@ -56,7 +57,10 @@ def viz(filename: str, output_filename: str, band: Optional[str] = None) -> None
 def measure(filename: str, band: Optional[str] = None) -> None:
     data_table = read_file(filename)
 
-    timing_data = measure_time(data_table, band=band)
+    try:
+        timing_data = measure_time(data_table, band=band)
+    except MissingDataError as err:
+        raise click.ClickException(str(err))
 
     print(json.dumps(timing_data, indent=4))
 
