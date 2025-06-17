@@ -27,7 +27,7 @@ pandas-stubs = "^2.2.3.250308"
 packages = [{include = "nova_times", from = "src"}]
 
 [[tool.mypy.overrides]]
-module = ["astropy.*"]
+module = ["astropy.*", "sklearn.*"]
 ignore_missing_imports = true
 
 [tool.coverage.run]

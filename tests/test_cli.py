@@ -111,6 +111,26 @@ def test_cli_measure_band(mock_read_csv, mock_measure_time, runner):
 
 @patch("nova_times.cli.measure_time")
 @patch("nova_times.cli.read_csv")
+def test_cli_measure_algo(mock_read_csv, mock_measure_time, runner):
+    mock_measure_time.return_value = {"a": 1}
+    result = runner.invoke(cli, ["measure", "good_filename", "--algo", "nearest_point"])
+    mock_read_csv.assert_called_with("good_filename")
+    assert "algorithm" in mock_measure_time.call_args[1]
+    assert mock_measure_time.call_args[1]["algorithm"] == "nearest_point"
+    assert mock_read_csv.return_value in mock_measure_time.call_args[0]
+    assert result.exit_code == 0
+
+
+@patch("nova_times.cli.measure_time")
+@patch("nova_times.cli.read_csv")
+def test_cli_measure_raises_on_unknown_algo(mock_read_csv, mock_measure_time, runner):
+    mock_measure_time.return_value = {"a": 1}
+    result = runner.invoke(cli, ["measure", "good_filename", "--algo", "fakealgo"])
+    assert result.exit_code == 2
+
+
+@patch("nova_times.cli.measure_time")
+@patch("nova_times.cli.read_csv")
 def test_cli_measure_raises_on_no_data(mock_read_csv, mock_measure_time, runner):
     mock_measure_time.side_effect = MissingDataError("not enough Data")
     result = runner.invoke(cli, ["measure", "good_filename", "--band", "band1"])

@@ -8,7 +8,7 @@ from astropy.table import Table
 
 from nova_times.describe import describe_dataset
 from nova_times.exceptions import MissingDataError
-from nova_times.measure import measure_time
+from nova_times.measure import measure_time, ALGORITHM_FUNCTIONS
 from nova_times.viz import viz_dataset
 from nova_times.io import read_csv
 
@@ -54,11 +54,19 @@ def viz(filename: str, output_filename: str, band: Optional[str] = None) -> None
 @click.argument("filename", required=True)
 # @click.argument("output_filename", required=True)
 @click.option("-b", "--band", "band")
-def measure(filename: str, band: Optional[str] = None) -> None:
+@click.option(
+    "--algo",
+    "--algorithm",
+    "algorithm",
+    type=click.Choice(list(ALGORITHM_FUNCTIONS.keys())),
+)
+def measure(
+    filename: str, band: Optional[str] = None, algorithm: Optional[str] = None
+) -> None:
     data_table = read_file(filename)
 
     try:
-        timing_data = measure_time(data_table, band=band)
+        timing_data = measure_time(data_table, band=band, algorithm=algorithm)
     except MissingDataError as err:
         raise click.ClickException(str(err))
 

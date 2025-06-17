@@ -20,6 +20,23 @@ class TestMeasureTime:
         result = measure_time(test_dataset)
         assert result["band"] == "V"
 
+    def test_can_select_different_band(self, test_dataset):
+        result = measure_time(test_dataset, band="B")
+        assert result["band"] == "B"
+        assert result["maximum_mag"] == 11.296
+
+    def test_default_algo_is_nearest_point(self, test_dataset):
+        result = measure_time(test_dataset)
+        assert result["algorithm"] == "nearest_point"
+
+    def test_raises_when_no_data(self, test_dataset):
+        with pytest.raises(MissingDataError) as err:
+            measure_time(test_dataset, band="NotARealBand")
+        assert "0 points in band NotARealBand" in str(err.value)
+
+
+class TestNearestPoint:
+
     def test_maximum_mag(self, test_dataset):
         result = measure_time(test_dataset)
         assert result["maximum_mag"] == 9.42
@@ -39,13 +56,3 @@ class TestMeasureTime:
         result = measure_time(test_dataset)
         assert result["t2_jd"] == 2460573.96765
         assert isinstance(result["maximum_jd"], float)
-
-    def test_can_select_different_band(self, test_dataset):
-        result = measure_time(test_dataset, band="B")
-        assert result["band"] == "B"
-        assert result["maximum_mag"] == 11.296
-
-    def test_raises_when_no_data(self, test_dataset):
-        with pytest.raises(MissingDataError) as err:
-            measure_time(test_dataset, band="NotARealBand")
-        assert "0 points in band NotARealBand" in str(err.value)
